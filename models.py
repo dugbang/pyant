@@ -20,13 +20,32 @@ class Area:
         x = (idx % World.WORLD_WIDTH) * World.AREA_WIDTH
         self.__position = Vector2((x, y)) + Vector2(World.AREA_SIZE) / 2
 
+        self.__to_food = 0
+        self.__to_home = 0
+
+    @property
+    def to_food(self):
+        return self.__to_food
+
+    @property
+    def to_home(self):
+        return self.__to_home
+
+    def marker(self, state):
+        if state == 'toFood':
+            self.__to_food += 1
+        if state == 'toHome':
+            self.__to_home += 1
+        else:
+            raise Exception(f"Error Ant State; {state}")
+
     def debug_output(self):
         logger.debug(self.__position)
 
 
 class World:
-    AREA_WIDTH = 40
-    AREA_HEIGHT = 40
+    AREA_WIDTH = 100    # 40, 40
+    AREA_HEIGHT = 100
     AREA_SIZE = (AREA_WIDTH, AREA_HEIGHT)
 
     WORLD_WIDTH = SCREEN_WIDTH // AREA_WIDTH
@@ -37,6 +56,10 @@ class World:
         for i in range(World.WORLD_WIDTH * World.WORLD_HEIGHT):
             self.__area_list.append(Area(i))
 
+    def marker(self, position, state):
+        idx = self.get_area(position)
+        self.__area_list[idx].marker(state)
+
     @staticmethod
     def get_area(position):
         col_ = position[0] // World.AREA_WIDTH
@@ -44,8 +67,10 @@ class World:
         return int(row_ * World.WORLD_WIDTH + col_)
 
     def debug_output(self):
-        for a in self.__area_list:
-            a.debug_output()
+        for i, a in enumerate(self.__area_list):
+            if a.to_food == 0:
+                continue
+            logger.debug(f"to food idx; {i}, value; {a.to_food}")
 
 
 class AntRandomWork:
@@ -63,6 +88,8 @@ class AntRandomWork:
         self.__cur_area = None
         self.__next_area = None
 
+        self.__state = 'toFood'  # toHome
+
     def move(self, surface):
         angle = random.randint(-5, 5)
         self.direction.rotate_ip(angle)
@@ -71,7 +98,9 @@ class AntRandomWork:
 
         self.__cur_area = self.__world.get_area(self.position)
         if self.__prev_area != self.__cur_area:
+            self.__world.marker(self.position, self.__state)
             logger.debug(f"area change; {self.__prev_area} -> {self.__cur_area}")
+            self.__world.debug_output()
             self.__prev_area = self.__cur_area
 
     def draw(self, surface):
