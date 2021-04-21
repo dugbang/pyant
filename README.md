@@ -7,9 +7,16 @@
 
 1. pygame 에서 물체의 랜덤 워크를 구현해보자.
 1. 좌표계와 맵의 관계를 정의하자.
+1. 임의의 영역으로 이동하기
+1. 회귀 로직 작성하기
 
 
 ### 작업일지
+
+#### 20210420
+
+* 랜덤 워크 이동 영역 제한
+* marker 사라지는 효과 구현 (fade off)
 
 #### 20210420
 
@@ -27,3 +34,4 @@
 1. [C++ Ants Simulation](https://youtu.be/81GQNPJip2Y)
     - [AntSimulator](https://github.com/johnBuffer/AntSimulator)
 1. [Build an Asteroids Game With Python and Pygame](https://realpython.com/asteroids-game-python/)
+1. [PyGame: A Primer on Game Programming in Python](https://realpython.com/pygame-a-primer/)

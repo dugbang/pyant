@@ -13,6 +13,42 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+
+
+class Marker(pygame.sprite.Sprite):
+    ALPHA_DISCOUNTER = 1
+
+    def __init__(self, position):
+        self.__alpha = 255
+        self.__counter = 0
+        self.__size = Vector2((60, 60))
+
+        super(Marker, self).__init__()
+        self.__surf = pygame.Surface(self.__size)
+        pygame.draw.circle(self.__surf, GREEN, self.__size / 2, (self.__size / 2)[0])
+        # self.__surf.fill((255, 255, 255))
+        self.__rect = self.__surf.get_rect(center=position)
+        self.__surf.set_alpha(self.__alpha)
+
+    def update(self):
+        self.__counter += 1
+        if self.__counter % Marker.ALPHA_DISCOUNTER == 0:
+            self.__counter = 0
+            self.__alpha -= 1
+
+        if self.__alpha < 0:
+            self.kill()
+        else:
+            self.__surf.set_alpha(self.__alpha)
+
+    def draw(self, surface):
+        surface.blit(self.__surf, self.__rect)
+
 
 class Area:
     def __init__(self, idx=0):
@@ -34,7 +70,7 @@ class Area:
     def marker(self, state):
         if state == 'toFood':
             self.__to_food += 1
-        if state == 'toHome':
+        elif state == 'toHome':
             self.__to_home += 1
         else:
             raise Exception(f"Error Ant State; {state}")
@@ -44,7 +80,7 @@ class Area:
 
 
 class World:
-    AREA_WIDTH = 100    # 40, 40
+    AREA_WIDTH = 100  # 40, 40
     AREA_HEIGHT = 100
     AREA_SIZE = (AREA_WIDTH, AREA_HEIGHT)
 
@@ -90,11 +126,22 @@ class AntRandomWork:
 
         self.__state = 'toFood'  # toHome
 
-    def move(self, surface):
+    def move(self):
         angle = random.randint(-5, 5)
         self.direction.rotate_ip(angle)
         self.velocity = self.velocity.rotate(angle)
-        self.position = wrap_position(self.position + self.velocity, surface)
+
+        # self.position = wrap_position(self.position + self.velocity, surface)
+        self.position = self.position + self.velocity
+        if self.position[0] < 10:
+            self.position[0] = 10
+        elif self.position[0] > SCREEN_WIDTH - 10:
+            self.position[0] = SCREEN_WIDTH - 10
+
+        if self.position[1] < 10:
+            self.position[1] = 10
+        elif self.position[1] > SCREEN_HEIGHT - 10:
+            self.position[1] = SCREEN_HEIGHT - 10
 
         self.__cur_area = self.__world.get_area(self.position)
         if self.__prev_area != self.__cur_area:
@@ -118,4 +165,3 @@ class AntRandomWork:
 if __name__ == '__main__':
     w = World()
     logger.debug(f"{w.get_area(Vector2((10, 50)))}")
-

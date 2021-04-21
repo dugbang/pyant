@@ -15,13 +15,13 @@ UP = Vector2(0, -1)
 
 
 if __name__ == '__main__':
-    direction = Vector2((0, -1))
-    logger.debug(f"{direction}")
-    logger.debug(f"{direction.rotate_ip(30)}")
-    logger.debug(f"{direction.angle_to(UP)}")
-
-    velocity = Vector2((0, -1))
-    logger.debug(f"{velocity}")
-    logger.debug(f"{velocity.rotate(30)}")
-    velocity = velocity.rotate(30)
-    logger.debug(f"{velocity.rotate(30)}")
+    direction = Vector2((4, 4))
+    logger.debug(f"{direction}, {direction/2}, {(direction/2)[0]}")
+    # logger.debug(f"{direction.rotate_ip(30)}")
+    # logger.debug(f"{direction.angle_to(UP)}")
+    #
+    # velocity = Vector2((0, -1))
+    # logger.debug(f"{velocity}")
+    # logger.debug(f"{velocity.rotate(30)}")
+    # velocity = velocity.rotate(30)
+    # logger.debug(f"{velocity.rotate(30)}")

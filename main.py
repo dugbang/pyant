@@ -1,7 +1,7 @@
 import pygame
 from pygame.math import Vector2
 
-from models import SCREEN_SIZE, AntRandomWork, World
+from models import SCREEN_SIZE, AntRandomWork, World, Marker
 
 
 class AntSimulation:
@@ -13,7 +13,9 @@ class AntSimulation:
         self.__clock = pygame.time.Clock()
 
         self.__world = World()
-        self.__ant = AntRandomWork(Vector2(SCREEN_SIZE) / 2, world=self.__world)
+        self.__ant = AntRandomWork(Vector2(250, 250), world=self.__world)
+
+        self.__m = Marker(Vector2(550, 350))
 
     def main_loop(self):
         while True:
@@ -30,11 +32,13 @@ class AntSimulation:
                 quit()
 
     def __process_game_logic(self):
-        self.__ant.move(self.__screen)
+        self.__ant.move()
+        self.__m.update()
 
     def __draw(self):
         self.__screen.fill((0, 0, 0))
         self.__ant.draw(self.__screen)
+        self.__m.draw(self.__screen)
 
         pygame.display.flip()
 
