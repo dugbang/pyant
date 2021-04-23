@@ -10,10 +10,8 @@ from world import SCREEN_WIDTH, SCREEN_HEIGHT
 UP = Vector2(0, -1)
 
 
-class Ant(pygame.sprite.Sprite):
+class Ant:
     def __init__(self, position, angle=0, world=None, ):
-        super(Ant, self).__init__()
-
         self.__direction = Vector2(UP)
         self.__position = Vector2(position)
         self.__velocity = Vector2(UP)
@@ -36,19 +34,30 @@ class Ant(pygame.sprite.Sprite):
 
         self.__state = 'toFood'  # toHome
 
+    @property
+    def position(self):
+        return self.__position
+
     def update(self):
         if self.__target:
-            angle = self.__direction.angle_to(self.__target)
-            self.__direction.rotate_ip(angle)
-            self.__velocity = self.__velocity.rotate(angle)
+            new_dir = self.__target - self.__position
+            angle = self.__direction.angle_to(new_dir)
+        else:
+            angle = random.randint(-7, 7)
+        self.__direction.rotate_ip(angle)
+        self.__velocity = self.__velocity.rotate(angle)
 
         self.__limit_position()
 
+        # todo; 위치정보에 대하여 좀더 고민해봐야 할 듯...
         self.__cur_area = self.__world.get_area(self.__position)
         if self.__prev_area != self.__cur_area:
             self.__world.marker(self.__position, self.__state)
-            logger.debug(f"area change; {self.__prev_area} -> {self.__cur_area}")
-            self.__world.debug_output()
+            # area = None
+            # area = self.__world.get_next_idx(self.__cur_area, self.__prev_area)
+            # self.__target = self.__world.get_position(area)
+            # logger.debug(f"area change; {self.__prev_area} -> {self.__cur_area}, next; {area}, {self.__target}")
+            # self.__world.debug_output()
             self.__prev_area = self.__cur_area
 
     def find_food(self):
@@ -56,6 +65,13 @@ class Ant(pygame.sprite.Sprite):
 
     def target(self, position):
         self.__target = position
+
+    def arrive_target(self):
+        if self.__target is None:
+            return False
+        if self.__position.distance_to(self.__target) > 10:
+            return False
+        return True
 
     def __limit_position(self):
         self.__position = self.__position + self.__velocity

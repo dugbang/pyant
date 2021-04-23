@@ -15,15 +15,14 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
 
-class Marker(pygame.sprite.Sprite):
-    ALPHA_DISCOUNTER = 5
+class Marker:
+    ALPHA_DISCOUNTER = 2
 
     def __init__(self, position, mode='toFood'):
         self.__alpha = 255
         self.__counter = 0
         self.__size = Vector2((6, 6))
 
-        super(Marker, self).__init__()
         self.__surf = pygame.Surface(self.__size)
         if mode == 'toFood':
             pygame.draw.circle(self.__surf, BLUE, self.__size / 2, (self.__size / 2)[0])
@@ -39,10 +38,11 @@ class Marker(pygame.sprite.Sprite):
             self.__counter = 0
             self.__alpha -= 1
 
-        if self.__alpha < 0:
-            self.kill()
-        else:
+    def apply_alpha(self):
+        if self.__alpha > 0:
             self.__surf.set_alpha(self.__alpha)
+            return True
+        return False
 
     def draw(self, surface):
         surface.blit(self.__surf, self.__rect)
@@ -87,8 +87,8 @@ class Area:
 
 
 class World:
-    AREA_WIDTH = 100  # 40, 40
-    AREA_HEIGHT = 100
+    AREA_WIDTH = 40
+    AREA_HEIGHT = 40
     AREA_SIZE = (AREA_WIDTH, AREA_HEIGHT)
 
     WORLD_WIDTH = SCREEN_WIDTH // AREA_WIDTH
@@ -112,13 +112,13 @@ class World:
         for i in range(World.WORLD_WIDTH * World.WORLD_HEIGHT):
             self.__area_list.append(Area(i))
 
-    def marker(self, position, state):
+    def marker(self, position, state='toFood'):
         idx = self.get_area(position)
         self.__area_list[idx].marker(state)
         if self.__marker_callback:
             self.__marker_callback(Marker(position, state))
 
-    def get_next_idx(self, cur, prev):
+    def get_next_idx(self, cur, prev=None):
         # todo; 주변 8개의 맵 정보를 읽어서 처리한다.
         areas = list()
         center = self.get_position(cur)
@@ -147,10 +147,16 @@ class World:
         return self.__area_list[index].position
 
     def debug_output(self):
+        # logger.debug(f"AREA to food information")
+        msg = ''
         for i, a in enumerate(self.__area_list):
             if a.to_food == 0:
                 continue
-            logger.debug(f"to food idx; {i}, value; {a.to_food}")
+            # logger.debug(f"to food idx; {i}, value; {a.to_food}")
+            msg += f"{i, a.to_food, a.to_home}, "
+            if i % 6 == 0:
+                msg += '\n'
+        logger.debug(f"AREA to food information. \n{msg}")
 
 
 if __name__ == '__main__':
